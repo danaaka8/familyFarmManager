@@ -21,7 +21,7 @@ router.post('/shorten', async (req, res) => {
       res.json(link.shortUrl);
     } else {
       // Generate a short URL
-      const shortUrl = `http://localhost:3000/api/${shortid.generate()}`;
+      const shortUrl = `${process.env.BASE_URL}${shortid.generate()}`;
 
       res.json(shortUrl);
     }

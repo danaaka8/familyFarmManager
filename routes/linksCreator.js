@@ -62,7 +62,7 @@ router.post('/links/create', async (req, res) => {
     formData.append('hash', farm.hash);
 
     let originalUrl = `https://apps.facebook.com/family-farm/facebook/get_reward/?vk=${key}_${farm.snsid}___${type}`
-    const response = await axios.post('http://localhost:3000/api/shorten', { originalUrl });
+    const response = await axios.post(`${process.env.BASE_URL}shorten`, { originalUrl });
     const shortUrl = response.data;
 
     try {
