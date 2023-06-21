@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Types</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <style>
+      body {
+        background-color: #f1f1f1;
+        padding-top: 60px; /* Add padding to the top to accommodate the fixed-top navbar */
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .type-card {
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      .type-card h3 {
+        margin-top: 0;
+      }
+
+      .type-card p {
+        margin-bottom: 10px;
+      }
+
+
+      .create-type-button {
+        text-align: right;
+        margin-bottom: 20px;
+      }
+    </style>
+</head>
+<body>
+
+<%- include('components/navigation') %>
+
+
+<div class="container">
+    <div class="create-type-button">
+        <a href="/admin/types/create" class="btn btn-primary">Create Type</a>
+    </div>
+    <h1>All Types</h1>
+    <% types.forEach(function(type) { %>
+        <div class="type-card">
+            <h3><%= type.name %></h3>
+            <p>Value: <%= type.value %></p>
+            <form id="delete-form-<%= type._id %>" action="/admin/types/<%= type._id %>" method="POST">
+                <button class="delete-type btn btn-danger" type="submit" data-type-id="<%= type._id %>">Delete</button>
+            </form>
+        </div>
+    <% }); %>
+</div>
+
+<script>
+  const deleteButtons = document.querySelectorAll('.delete-type');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      const typeId = event.target.dataset.typeId;
+      const deleteForm = document.querySelector(`#delete-form-${typeId}`);
+      if (confirm('Are you sure you want to delete this type?')) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('DELETE', deleteForm.action, true);
+        xhr.onload = function () {
+          if (xhr.status === 204) {
+            alert('Type deleted successfully.');
+            window.location.reload();
+          } else {
+            alert('An error occurred while deleting the type.');
+          }
+        };
+        xhr.send();
+      }
+    });
+  });
+</script>
+</body>
+</html>

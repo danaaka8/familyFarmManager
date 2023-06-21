@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Farm Manager</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+      *{
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+        margin-top: 80px; /* Adjust margin-top value as needed */
+      }
+
+      .title {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .title-container{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .form-control {
+        margin-bottom: 10px;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+
+
+      button{
+        cursor:pointer
+      }
+    </style>
+</head>
+<body>
+
+<%- include('components/navigation') %>
+
+<div class="container">
+    <div class="title-container">
+        <h2 class="title">Generate Farm Links</h2>
+        <span><%= totalFarms %></span>
+    </div>
+
+    <select id="key-type-select" class="form-control" name="type">
+        <% types.forEach(function(type) { %>
+            <option value="<%= type.value %>"><%= type.name %></option>
+        <% }); %>
+    </select>
+
+    <button id="generate-button" class="form-control" type="submit" onclick="pushRequestToFarms(<%= JSON.stringify(farms) %>)">Generate</button>
+</div>
+<script>
+
+  function pushRequestToFarms(farms){
+    let type = document.getElementById('key-type-select').value;
+    let reward = document.getElementById('key-type-select').name;
+
+    if (confirm('Are you sure you want to start creating links?')) {
+      // Perform AJAX request to delete the farm
+      let xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/links/create/');
+      xhr.setRequestHeader('Content-Type', 'application/json');
+
+      xhr.onload = function() {
+        if (xhr.status === 500) {
+          console.error(xhr.responseText);
+          alert('An error occurred while creating links.');
+        } else {
+          // Redirect to the desired URL after the request is completed
+          window.location.href = '/admin/links';
+        }
+      };
+      xhr.send(JSON.stringify({
+        farms: farms,
+        type: type,
+        reward:reward
+      }));
+    }
+  }
+</script>
+</body>
+</html>

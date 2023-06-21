@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Links</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>    <style>
+      body {
+        background-color: #f1f1f1;
+        padding-top: 60px; /* Add padding to the top to accommodate the fixed-top navbar */
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .link-card {
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      .link-card h3 {
+        margin-top: 0;
+      }
+
+      .link-card p {
+        margin-bottom: 10px;
+      }
+
+      .copy-button {
+        margin-bottom: 10px;
+      }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+
+</head>
+<body>
+
+<%- include('components/navigation') %>
+
+<div class="container">
+    <h1>All Links</h1>
+
+    <form class="form-inline mb-3">
+        <div class="form-group mr-2">
+            <label for="typeFilter">Filter by Type:</label>
+            <select class="form-control ml-2" id="typeFilter">
+                <option value="">All</option>
+                <% types.forEach(function(type) { %>
+                    <option value="<%= type.value %>"><%= type.name %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="rewardFilter">Filter by Reward:</label>
+            <select class="form-control ml-2" id="rewardFilter">
+                <option value="">All</option>
+                <% rewards.forEach(function(reward) { %>
+                    <option value="<%= reward %>"><%= reward %></option>
+                <% }); %>
+            </select>
+        </div>
+    </form>
+    <%function formatDate(date) {
+        const formattedDate = new Date(date);
+        const hours = formattedDate.getHours();
+        const minutes = formattedDate.getMinutes();
+        const seconds = formattedDate.getSeconds();
+        return `${hours}:${minutes}:${seconds}`;
+    }%>
+    <% links.forEach(function(link) {
+        const currentDate = new Date();
+        const createdAt = new Date(link.createdAt);
+        const isExpired = (currentDate - createdAt) >= (24 * 60 * 60 * 1000); // Check if the link is expired
+
+    %>
+    <div class="link-card">
+        <h3><%= link.shortUrl %> <%= isExpired ? '(Expired)' : '(Valid)' %></h3>
+        <p>Type: <%= link.type %></p>
+        <p>Reward: <%= link.reward %></p>
+        <p>Created At: <%= formatDate(link.createdAt) %></p>
+        <button class="copy-button btn btn-primary" data-clipboard-text="<%= link.shortUrl %>">Copy</button>
+    </div>
+    <% }); %>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+<script>
+  const copyButtons = document.querySelectorAll('.copy-button');
+  copyButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const clipboard = new ClipboardJS(button);
+      clipboard.on('success', () => {
+        alert('Link copied to clipboard.');
+      });
+      clipboard.on('error', () => {
+        alert('Failed to copy link to clipboard.');
+      });
+    });
+  });
+
+  const typeFilter = document.getElementById('typeFilter');
+  const rewardFilter = document.getElementById('rewardFilter');
+
+  typeFilter.addEventListener('change', filterLinks);
+  rewardFilter.addEventListener('change', filterLinks);
+
+  function filterLinks() {
+    const selectedType = typeFilter.value;
+    const selectedReward = rewardFilter.value;
+
+    const linkCards = document.getElementsByClassName('link-card');
+    Array.from(linkCards).forEach(card => {
+      const type = card.querySelector('p:nth-child(2)').textContent.split(': ')[1];
+      const reward = card.querySelector('p:nth-child(3)').textContent.split(': ')[1];
+
+      if ((selectedType === '' || selectedType === type) && (selectedReward === '' || selectedReward === reward)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+</script>
+</body>
+</html>
